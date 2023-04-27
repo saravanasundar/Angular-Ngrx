@@ -17,6 +17,7 @@ export interface ProductState {
   currentProduct: Product;
   products: Product[];
   currentProductId: number;
+  error: string;
 }
 
 const initialState: ProductState = {
@@ -24,6 +25,7 @@ const initialState: ProductState = {
   currentProduct: null,
   currentProductId: null,
   products: [],
+  error: '',
 };
 
 export const productReducer = createReducer<ProductState>(
@@ -58,6 +60,18 @@ export const productReducer = createReducer<ProductState>(
         starRating: 0,
       },
     };
+  }),
+  on(ProductActions.loadProductsSuccess, (state, action): ProductState => {
+    return {
+      ...state,
+      products: action.products,
+    };
+  }),
+  on(ProductActions.loadProductsFailure, (state, action): ProductState => {
+    return {
+      ...state,
+      error: action.error,
+    };
   })
 );
 
@@ -89,4 +103,9 @@ export const getCurrentProduct = createSelector(
 export const getProducts = createSelector(
   getProductFeatureState,
   (state: ProductState) => state.products
+);
+
+export const getProductLoadFailures = createSelector(
+  getProductFeatureState,
+  (state: ProductState) => state.error
 );

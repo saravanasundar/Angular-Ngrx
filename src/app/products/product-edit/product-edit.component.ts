@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { Subscription } from 'rxjs';
+import { Observable, Subscription, tap } from 'rxjs';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
@@ -22,6 +22,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   public product: Product | null;
   public sub: Subscription;
+  public product$: Observable<Product>;
 
   // Use with the generic validation message class
   displayMessage: any = null;
@@ -75,9 +76,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     //   (currentProduct) => this.displayProduct(currentProduct)
     // );
 
-    this.store
+    this.product$ = this.store
       .select(getCurrentProduct)
-      .subscribe((currentProduct) => this.displayProduct(currentProduct));
+      .pipe(tap((currentProduct) => this.displayProduct(currentProduct)));
 
     // Watch for value changes for validation
     this.productForm.valueChanges.subscribe(
@@ -102,7 +103,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   displayProduct(product: Product | null): void {
     // Set the local product property
-    this.product = product;
+    // this.product = product;
 
     if (product) {
       // Reset the form back to pristine

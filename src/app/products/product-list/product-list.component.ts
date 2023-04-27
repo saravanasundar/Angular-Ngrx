@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
 import {
   getCurrentProduct,
+  getProductLoadFailures,
+  getProducts,
   getShowProductCode,
   state,
 } from '../state/product.reducer';
@@ -28,6 +30,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
   // Used to highlight the selected product in the list
   selectedProduct: Product | null;
   sub: Subscription;
+  products$: Observable<Product[]>;
+  errorMessage$: Observable<string> | null;
 
   constructor(
     private productService: ProductService,
@@ -42,10 +46,19 @@ export class ProductListComponent implements OnInit, OnDestroy {
       .select(getCurrentProduct)
       .subscribe((currentProduct) => (this.selectedProduct = currentProduct));
 
-    this.productService.getProducts().subscribe({
-      next: (products: Product[]) => (this.products = products),
-      error: (err) => (this.errorMessage = err),
-    });
+    // this.productService.getProducts().subscribe({
+    //   next: (products: Product[]) => (this.products = products),
+    //   error: (err) => (this.errorMessage = err),
+    // });
+
+    // one way of getting data without subscribing
+    this.store.dispatch(ProductActions.loadProducts());
+    this.store
+      .select(getProducts)
+      .subscribe((products) => (this.products = products));
+
+    // this will handle error and display in UI
+    this.errorMessage$ = this.store.select(getProductLoadFailures);
 
     this.store
       .select(getShowProductCode)

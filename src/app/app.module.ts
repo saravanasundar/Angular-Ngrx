@@ -19,6 +19,7 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 
 /* Feature Modules */
 import { UserModule } from './user/user.module';
+import { EffectsModule } from '@ngrx/effects';
 
 @NgModule({
   imports: [
@@ -31,6 +32,7 @@ import { UserModule } from './user/user.module';
       maxAge: 25,
       logOnly: environment.production,
     }),
+    EffectsModule.forRoot([]),
     UserModule,
     AppRoutingModule,
   ],
