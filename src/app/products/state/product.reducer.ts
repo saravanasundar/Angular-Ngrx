@@ -1,12 +1,12 @@
 import {
   createReducer,
   on,
-  createAction,
   createFeatureSelector,
   createSelector,
 } from '@ngrx/store';
 import * as AppState from '../../state/app.state';
 import { Product } from '../product';
+import * as ProductActions from './product.actions';
 
 export interface state extends AppState.State {
   products: ProductState;
@@ -14,14 +14,14 @@ export interface state extends AppState.State {
 
 export interface ProductState {
   showProductCode: boolean;
-  // currentProduct: Product;
+  currentProduct: Product;
   products: Product[];
   currentProductId: number;
 }
 
 const initialState: ProductState = {
   showProductCode: true,
-  // currentProduct: null,
+  currentProduct: null,
   currentProductId: null,
   products: [],
 };
@@ -29,10 +29,34 @@ const initialState: ProductState = {
 export const productReducer = createReducer<ProductState>(
   // feature name and event
   initialState,
-  on(createAction('[Product] Toggle product Code'), (state): ProductState => {
+  on(ProductActions.toggleProductCode, (state): ProductState => {
     return {
       ...state,
       showProductCode: !state.showProductCode,
+    };
+  }),
+  on(ProductActions.setCurrentProduct, (state, action): ProductState => {
+    return {
+      ...state,
+      currentProduct: action.product,
+    };
+  }),
+  on(ProductActions.clearCurrentProduct, (state, action): ProductState => {
+    return {
+      ...state,
+      currentProduct: null,
+    };
+  }),
+  on(ProductActions.initializeCurrentProduct, (state): ProductState => {
+    return {
+      ...state,
+      currentProduct: {
+        id: 0,
+        productName: '',
+        productCode: 'new',
+        description: '',
+        starRating: 0,
+      },
     };
   })
 );
@@ -52,10 +76,15 @@ export const getCurrentProductId = createSelector(
 
 export const getCurrentProduct = createSelector(
   getProductFeatureState,
-  getCurrentProductId,
-  (state: ProductState, currentProductId) =>
-    state.products.find((p) => (p.id = currentProductId))
+  (state: ProductState) => state.currentProduct
 );
+
+// export const getCurrentProduct = createSelector(
+//   getProductFeatureState,
+//   getCurrentProductId,
+//   (state: ProductState, currentProductId) =>
+//     state.products.find((p) => (p.id = currentProductId))
+// );
 
 export const getProducts = createSelector(
   getProductFeatureState,
