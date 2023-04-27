@@ -7,7 +7,7 @@ const productList = {
 export const productReducer = createReducer(
   // feature name and event
   productList,
-  on(createAction('[Product] Toggle product Code'), (state, action) => {
+  on(createAction('[Product] Toggle product Code'), (state) => {
     return {
       ...state,
       showProductCode: !state.showProductCode,
